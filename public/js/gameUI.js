@@ -1,19 +1,36 @@
 var cl_socket = io.connect('http://localhost:3000');
+var client = {
+	loc : 'lobby',
+	socket: cl_socket
+}
 
 
 
 
+cl_socket.on('roomList', receivedRooms);
+cl_socket.on('joinSuccess', joinedRoom);
 
-cl_socket.on('lobbyList', listLobbies(data));
+
+function joinedRoom(room) {
+
+	console.log('Success! Room #' + room + ' has been joined.');
+}
 
 
-
-function listLobbies(array) {
-	console.log('Lobby list received...');
+function receivedRooms(array) {
+	console.log('Room list received...');
 	console.log(array);
-	array.forEach(function(lobby) {
-		$('#ui_rooms').append('<p> Lobby #' + lobby.id + '</p>');
+	array.forEach(function(room) {
+		var roomRow = $('<li></li>');
+		var btnJoin = $('<button>Join</button>');
+		btnJoin.on('click',function(e) {
+			console.log('attempting to join room#' + room.id)
+			cl_socket.emit('joinRoom',room.id);
+		});
 
+		roomRow.append('Lobby #' + room.id + '  - <strong>(' + room.players.length + ' / 4)</strong>');
+		roomRow.append(btnJoin);
+		$('#room_list').append(roomRow);
 	});
 }
 
