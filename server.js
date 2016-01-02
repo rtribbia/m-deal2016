@@ -19,20 +19,30 @@ gameStates.getJoinable = function() {
 	return result;
 }
 
+gameStates.isJoinable = function(roomId) {
+	return this.states[roomId].joinable;
+}
+
 gameStates.createGame = function() {
 	var newGame = {};
 	newGame.id = this.states.length;
 	newGame.players = [];
 	newGame.locked = false;
 	newGame.joinable = true;
+
+	newGame.addPlayer = function(player) {
+		//check if player can join/ isnt already in room
+		//add player obj to this.players
+	}
+
 	this.states.push(newGame);
 	console.log('Creating game: ' + newGame.id);
 }
 
-gameStates.sendLobbyList = function(socket) {
-	console.log('Sending lobbies to ' + socket.id)
+gameStates.sendRoomList = function(socket) {
+	console.log('Sending rooms to ' + socket.id)
 	var joinable = this.getJoinable();
-	io.to(socket.id).emit('lobbyList', joinable);
+	io.to(socket.id).emit('roomList', joinable);
 }
 
 io.on('connection', function(socket){
@@ -45,7 +55,8 @@ io.on('connection', function(socket){
 		gameStates.createGame();
 	}
 	
-	gameStates.sendLobbyList(socket);
+	gameStates.sendRoomList(socket);
+	socket.on('joinRoom',newPlayer.joinRoom);
 
 });
 
@@ -57,6 +68,7 @@ function createPlayer(socket) {
 	newPlayer.socket = socket;
 	newPlayer.inGame = false;
 	newPlayer.currentLoc = '';
+
 	newPlayer.loc = function(newLoc) {
 		if (newLoc) {
 			this.currentLoc = newLoc;
@@ -64,6 +76,22 @@ function createPlayer(socket) {
 			return this.currentLoc;
 		}
 	};
+
+	newPlayer.joinRoom = function(roomId) {
+		if (gameStates.isJoinable(roomId)) {
+			console.log('socket.leave..');
+			socket.leave(this.currentLoc);
+			console.log('this.loc');
+			this.currentLoc = roomId;
+			console.log('this.socket.join');
+			this.socket.join(roomId);
+			gameStates.states[roomId].addPlayer(this);
+			io.to(socket.id).emit('joinSuccess', roomId);
+			this.inGame = true;
+		}
+	}
+
+
 	return newPlayer;
 }
 
