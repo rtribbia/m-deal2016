@@ -7,34 +7,33 @@ var io = require('socket.io').listen(server);
 
 
 var gameStates = {
-	states: [],
+	states: []
+}
 
+gameStates.getJoinable = function() {
+	var result = [];
+	this.states.forEach(function(state) {
+		if (state.joinable)
+			result.push(state);
+	});
+	return result;
+}
 
+gameStates.createGame = function() {
+	var newGame = {};
+	newGame.id = this.states.length;
+	newGame.players = [];
+	newGame.locked = false;
+	newGame.joinable = true;
+	this.states.push(newGame);
+	console.log('Creating game: ' + newGame.id);
+}
 
-	getJoinable : function() {
-		var result = [];
-		this.states.forEach(function(state) {
-			if (state.joinable)
-				result.push(state);
-		});
-		return result;
-	}, createGame : function() {
-		var newGame = {};
-		newGame.id = this.states.length;
-		newGame.players = [];
-		newGame.locked = false;
-		newGame.joinable = true;
-		this.states.push(newGame);
-		console.log('Creating game: ' + newGame.id);
-	}, sendLobbyList : function(socket) {
-		console.log('Sending lobbies to ' + socket.id)
-		var joinable = this.getJoinable();
-		io.to(socket.id).emit('lobbyList', joinable);
-	}
-};
-
-
-
+gameStates.sendLobbyList = function(socket) {
+	console.log('Sending lobbies to ' + socket.id)
+	var joinable = this.getJoinable();
+	io.to(socket.id).emit('lobbyList', joinable);
+}
 
 io.on('connection', function(socket){
 	var newPlayer = createPlayer(socket);
