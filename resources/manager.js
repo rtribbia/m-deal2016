@@ -1,5 +1,8 @@
+var GameState = require('./gameState.js');
+
 function Manager(io) {
 	this.states = [];
+	this.io = io;
 }
 
 Manager.prototype.getJoinable = function() {
@@ -16,16 +19,16 @@ Manager.prototype.isJoinable = function(roomId) {
 }
 
 Manager.prototype.createGame = function() {
-	var game = new Game(this.states.length);
+	var game = new GameState(this.states.length);
 	this.states.push(game);
 
-	console.log('Creating game: ' + newGame.id);
+	console.log('Creating game: ' + game.id);
 }
 
 Manager.prototype.sendRoomList = function(socket) {
 	console.log('Sending rooms to ' + socket.id)
 	var joinable = this.getJoinable();
-	io.to(socket.id).emit('roomList', joinable);
+	this.io.to(socket.id).emit('roomList', joinable);
 }
 
 

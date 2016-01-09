@@ -1,32 +1,30 @@
 var express = require('express');
 var app = express();
 var http = require('http');
-// var io = require('socket.io')(http);
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
-var GameState = require('./resources/gameState.js');
 var Manager = require('./resources/manager.js');
 var Player = require('./resources/player.js');
 
 var manager = new Manager(io);
 
-var gameStates = {
-	states: []
-}
-
 io.on('connection', function(socket){
-	var newPlayer = createPlayer(socket);
-	newPlayer.loc('lobby');
+	var newPlayer = new Player(socket, manager);
+	newPlayer.loc('lobby'); //Set location on player and socket
 	console.log('New player connected: ' + newPlayer.id);
 
-	if (gameStates.getJoinable().length == 0) {
-		gameStates.createGame();
+	if (manager.getJoinable().length == 0) { //Check for available rooms
+		manager.createGame(); //if none, create room.
 	}
 	
-	gameStates.sendRoomList(socket);
+	manager.sendRoomList(socket); //Send room list to client.
+
+	//Socket client event listeners
 	socket.on('joinRoom',newPlayer.joinRoom);
 
 });
+
+
 
 // gameStates.getJoinable = function() {
 // 	var result = [];
