@@ -10,7 +10,7 @@ function Player(socket, manager) {
 }
 
 
-Player.prototype.loc = function(newLoc) {
+Player.prototype.loc = function(newLoc) { //Getter/Setter for player location
 	if (newLoc) {
 		if (this.currentLoc)
 			this.socket.leave(this.currentLoc);
@@ -21,19 +21,21 @@ Player.prototype.loc = function(newLoc) {
 	}
 };
 
-Player.joinRoom = function(roomId) {
-	if (gameStates.isJoinable(roomId)) {
-		console.log('socket.leave..');
-		socket.leave(this.currentLoc);
-		console.log('this.loc');
-		this.currentLoc = roomId;
-		console.log('this.socket.join');
-		this.socket.join(roomId);
-		gameStates.states[roomId].addPlayer(this);
-		io.to(socket.id).emit('joinSuccess', roomId);
-		this.inGame = true;
+Player.prototype.joinRoom = function(roomId) {
+	var cplayer = this;
+	console.log("cplayer: " + cplayer.ingame);
+	console.log("this: " + this.ingame);
+
+	if (this.manager.isJoinable(roomId)) {
+		this.loc(roomId); // Join room
+		this.manager.states[roomId].addPlayer(this); //Add player to gamestate's player list
+		this.inGame = true; //Set in player 'ingame' status to True
+
+		io.to(socket.id).emit('joinSuccess', roomId); //Tell client room join is successful.
 	}
 }
 
 
 module.exports = Player;
+
+

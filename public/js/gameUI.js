@@ -1,9 +1,5 @@
 
 
-
-
-
-
 function joinedRoom(room) {
 
 	console.log('Success! Room #' + room + ' has been joined.');
