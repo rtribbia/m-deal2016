@@ -12,7 +12,10 @@ function Player(socket, manager) {
 
 Player.prototype.loc = function(newLoc) {
 	if (newLoc) {
+		if (this.currentLoc)
+			this.socket.leave(this.currentLoc);
 		this.currentLoc = newLoc;
+		this.socket.join(newLoc);
 	} else {
 		return this.currentLoc;
 	}
