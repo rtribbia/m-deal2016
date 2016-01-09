@@ -17,7 +17,6 @@ var gameStates = {
 io.on('connection', function(socket){
 	var newPlayer = createPlayer(socket);
 	newPlayer.loc('lobby');
-	socket.join('lobby');
 	console.log('New player connected: ' + newPlayer.id);
 
 	if (gameStates.getJoinable().length == 0) {
