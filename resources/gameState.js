@@ -21,6 +21,7 @@ GameState.prototype.removePlayer = function(player) {
 		this.players.splice(inRoom,1);
 		return true;
 	} else {
+		console.log('attempted to remove ' + player.id + ' from room ID: ' + inRoom + ' BUT PLAYER WAS NOT FOUND');
 		return false;
 	}
 }

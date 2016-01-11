@@ -12,5 +12,7 @@ Client.prototype.joinRoom = function(roomID) {
 	this.socket.emit('cl_joinRoom',roomID)
 }
 
+
 cl_socket.on('roomList', receivedRooms);
 cl_socket.on('joinSuccess', joinedRoom);
+cl_socket.on('playersOnline', updatePlayersOnline);

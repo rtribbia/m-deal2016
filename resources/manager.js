@@ -1,8 +1,10 @@
 var GameState = require('./gameState.js');
+var Player = require('./player.js');
 
 function Manager(io) {
 	this.states = [];
 	this.io = io;
+	this.players = [];
 }
 
 
@@ -36,6 +38,31 @@ Manager.prototype.createGame = function() {
 }
 
 
+//Initializes new session: Creates player and sends them room list
+Manager.prototype.initializePlayer = function(socket) {
+	var newPlayer = this.createPlayer(socket);
+	newPlayer.loc('lobby'); //Set location on player and socket
+	this.updateLobbyRoomList();
+}
+
+//Creates new player and added them to the players array
+Manager.prototype.createPlayer = function(socket) {
+	var newPlayer = new Player(socket, this, this.io); 
+	this.players.push(newPlayer);
+	return newPlayer;
+}
+
+//Deletes player from the player array
+Manager.prototype.deletePlayer = function(socket) {
+	var playerObj = socket.player;
+	var playerIndex = this.players.indexOf(playerObj);
+	if (playerObj.currentLoc != 'lobby')
+		this.removePlayerFromRoom(socket, playerObj.currentLoc);
+	this.players.splice(playerIndex,1);
+	this.updateLobbyRoomList();
+
+}
+
 //Send joinable room list to roomname or socket
 Manager.prototype.sendRoomList = function(target) {
 	var joinable = this.getJoinable();
@@ -54,30 +81,53 @@ Manager.prototype.sendRoomList = function(target) {
 
 //Send everyone in the lobby an updated room list
 Manager.prototype.updateLobbyRoomList = function() {
-	
+	this.updatePlayersOnline();
 	this.sendRoomList('everyone');
 	
 	//this.sendRoomList('lobby');
 }
 
+Manager.prototype.updatePlayersOnline = function() {
+	var totalPlayers = this.players.length;
+	var playersIngame = this.getIngamePlayers().length;
+	this.io.emit('playersOnline',{online: totalPlayers, ingame: playersIngame});
+}
+
+
+Manager.prototype.getIngamePlayers = function() {
+	var result = [];
+
+	this.players.forEach(function(p,i) {
+		if (p.gameStatus()) //if player.inGame == true
+			result.push(i);
+	});
+	return result;
+}
 
 //Add a player to a gamestate (room) at roomID
-Manager.prototype.addPlayerToRoom = function(player,roomId) {
+Manager.prototype.addPlayerToRoom = function(socket,roomId) {
 	var currentRoom = this.states[roomId];
-	var hasPlayer = currentRoom.hasPlayer(player);
+	var playerObj = socket.player;
+	var hasPlayer = currentRoom.hasPlayer(playerObj);
 	if (hasPlayer != null) { //Player is trying to join same room.
-		console.log(player.id + ' is already in room # ' + roomId);
+		console.log(playerObj.id + ' is already in room # ' + roomId);
 		return false;
 	} else {
-		if (player.gameStatus()) { //Remove player from current room
-			this.states[player.currentLoc].removePlayer(player);
+		if (playerObj.gameStatus()) { //Remove player from current room
+			this.removePlayerFromRoom(socket,playerObj.currentLoc);
 		}
-		player.loc(roomId);
-		player.gameStatus(true);
-		currentRoom.addPlayer(player);
+		playerObj.loc(roomId);
+		playerObj.gameStatus(true);
+		currentRoom.addPlayer(playerObj);
 		this.updateLobbyRoomList();
 		return true;
 	}
+}
+
+//Remove a player from a gamestate (room) at roomID
+Manager.prototype.removePlayerFromRoom = function(socket,roomId) {
+	var playerObj = socket.player;
+	this.states[playerObj.currentLoc].removePlayer(playerObj);
 }
 
 

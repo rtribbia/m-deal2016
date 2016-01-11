@@ -23,6 +23,12 @@ function receivedRooms(array) {
 	});
 }
 
+function updatePlayersOnline(response) {
+
+	$('#ui_online').html('<p>Players online: ' + response.online + '<br>Players ingame: ' +  response.ingame + '</p>');
+
+}
+
 
 function addCard(id) {
 	cardDiv = $("<div id='" + id + "' class='card'/>");
