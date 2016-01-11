@@ -1,24 +1,24 @@
 
 
 function joinedRoom(room) {
-
 	console.log('Success! Room #' + room + ' has been joined.');
 }
 
 
 function receivedRooms(array) {
-	console.log('Room list received...');
-	console.log(array);
-	array.forEach(function(room) {
+	$('#room_list').empty(); //Empty child objects fromroomlist UL
+
+	array.forEach(function(room) { 
 		var roomRow = $('<li></li>');
 		var btnJoin = $('<button>Join</button>');
+
 		btnJoin.on('click',function(e) {
-			console.log('attempting to join room#' + room.id)
-			cl_socket.emit('joinRoom',room.id);
+			client.joinRoom(room.id)
 		});
 
-		roomRow.append('Lobby #' + room.id + '  - <strong>(' + room.players.length + ' / 4)</strong>');
+		roomRow.append('Lobby #' + room.id + '  - <strong>(' + room.playerCount + ' / 4)</strong>');
 		roomRow.append(btnJoin);
+
 		$('#room_list').append(roomRow);
 	});
 }
