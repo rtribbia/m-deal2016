@@ -1,12 +1,19 @@
 var GameState = require('./gameState.js');
 var Player = require('./player.js');
 
+
 function Manager(io) {
 	this.states = [];
 	this.io = io;
 	this.players = [];
 }
 
+
+Manager.prototype.getRoom = function(roomID) {
+
+	
+	
+}
 
 //Retrieve list of all rooms where joinable==true
 Manager.prototype.getJoinable = function() {

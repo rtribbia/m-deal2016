@@ -1,8 +1,11 @@
+var Deck = require('./deck.js');
+
 function GameState(id){
 	this.id = id;
 	this.players = [];
 	this.locked = false;
 	this.joinable = true;
+	this.deck = new Deck();
 };
 
 
@@ -10,7 +13,6 @@ function GameState(id){
 GameState.prototype.addPlayer = function(player) {
 	this.players.push(player);
 }
-
 
 //Removes player from current gamestate (players array)
 GameState.prototype.removePlayer = function(player) {
@@ -38,6 +40,9 @@ GameState.prototype.hasPlayer = function(player) {
 }
 
 
+GameState.prototype.sendDeck = function(player) {
+	player.io.to(player.socket.id).emit('sv_sendDeck', this.deck);
+}
 
 module.exports = GameState;
 
