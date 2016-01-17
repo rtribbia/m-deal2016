@@ -5,7 +5,7 @@ function GameState(id){
 	this.players = [];
 	this.locked = false;
 	this.joinable = true;
-	this.deck = new Deck();
+	this.deck = new Deck(this);
 };
 
 
@@ -39,9 +39,9 @@ GameState.prototype.hasPlayer = function(player) {
 	return found;
 }
 
+GameState.prototype.getDeck = function() {
 
-GameState.prototype.sendDeck = function(player) {
-	player.io.to(player.socket.id).emit('sv_sendDeck', this.deck);
+	return this.deck.getDeck();
 }
 
 module.exports = GameState;

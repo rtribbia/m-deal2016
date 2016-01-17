@@ -9,10 +9,9 @@ function Manager(io) {
 }
 
 
-Manager.prototype.getRoom = function(roomID) {
-
-	
-	
+Manager.prototype.sendDeck = function(socket) {
+	var deck = this.states[socket.player.loc()].getDeck();
+	this.io.to(socket.id).emit('deck',deck);
 }
 
 //Retrieve list of all rooms where joinable==true
