@@ -19,6 +19,26 @@ function Card(cardObj,id) {
 
 }
 
+Card.prototype.getObj = function() {
+	var cardObj = {}
+	cardObj.id = this.id;
+	cardObj.name = this.NAME;
+	cardObj.type = this.TYPE;
+	cardObj.value = this.VALUE;
+	cardObj.propertyColors = {
+		a: this.COLOR_A,
+		b: this.COLOR_B
+	};
+	cardObj.propertyValues = {
+		a: this.PROP_A,
+		b: this.PROP_B
+	};
+	cardObj.actionTarget = this.TARGET;
+	cardObj.description = this.DESC;
+	cardObj.subtext = this.SUB;
+	
+	return cardObj;
+}
 
 module.exports = Card;
 

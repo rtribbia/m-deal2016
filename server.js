@@ -6,8 +6,6 @@ var io = require('socket.io').listen(server);
 var Manager = require('./resources/manager.js');
 
 
-console.log(cardDB[4]);
-
 var manager = new Manager(io);
 
 io.on('connection', function(socket){
@@ -27,6 +25,10 @@ io.on('connection', function(socket){
 
 	socket.on('disconnect', function () {
 		manager.deletePlayer(socket);
+  	});
+
+  	socket.on('cl_getDeck', function() {
+  		manager.sendDeck(socket);
   	});
 
 });
