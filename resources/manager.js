@@ -138,3 +138,4 @@ Manager.prototype.removePlayerFromRoom = function(socket,roomId) {
 
 
 module.exports = Manager;
+
